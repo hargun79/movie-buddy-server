@@ -21,14 +21,18 @@ const userSchema = new mongoose.Schema({
     required: true
   },
   admin: {
-        type: Boolean,
-        default: false
+    type: Boolean,
+    default: false
   },
   movies: [
-    {
-      type: mongoose.Schema.Types.ObjectId,
-      ref: "Movie"
+   {
+    id: {
+      type: Number
+    },
+    rating: {
+      type: Number
     }
+   }
   ]
 });
 

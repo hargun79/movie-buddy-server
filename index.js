@@ -7,7 +7,7 @@ app.use(bodyParser.urlencoded({extended: true}));
 
 const db = require("./models");
 const jwt = require("jsonwebtoken");
-
+const axios = require('axios');
 const auth = require('./middlewares/is-Auth');
 
 // User Routes
@@ -79,18 +79,103 @@ app.post('/signin',async function(req,res){
   }
 });
 
+app.get('/recommend', auth.userAuth, async function(req,res){
+  try {
+    let user = await db.User.findOne({
+      email: req.body.email
+    });
+    var obj = {
+      user_id: user.userId,
+      ratings: "None",
+      type: "None",
+      number: 20 
+    }
+    let url="https://recsys-1234.herokuapp.com/predict";
+    var pr= axios.post(url,obj,{headers:{'Content-Type':'application/json'}});
+    pr.then(data=>{
+     return res.status(200).json(data.data);
+    }).catch(err=>{
+      return res.status(400).json({error: err});
+    })
+   } catch (err) {
+    return res.status(400).json({error: err});
+  }
+});
+
+app.post('/recommend', auth.userAuth, async function(req,res){
+  try {
+    var obj = {
+      user_id: req.body.userId,
+      ratings: req.body.ratings,
+      type: "Create",
+      number: 5 
+    }
+    let url="https://recsys-1234.herokuapp.com/predict";
+    var pr= axios.post(url,obj,{headers:{'Content-Type':'application/json'}});
+    pr.then(data=>{
+     return res.status(200).json({msg: "User Creation Successful !!"});
+    }).catch(err=>{
+      return res.status(400).json({ModelError: err});
+    })
+   } catch (err) {
+    return res.status(400).json({error: err});
+  }
+});
+
+app.put('/recommend', auth.userAuth, async function(req,res){
+  try {
+    var obj = {
+      user_id: req.body.userId,
+      ratings: req.body.ratings,
+      type: "Add",
+      number: 5 
+    }
+    let url="https://recsys-1234.herokuapp.com/predict";
+    var pr= axios.post(url,obj,{headers:{'Content-Type':'application/json'}});
+    pr.then(data=>{
+     return res.status(200).json({msg: "Movies Addition Successful !!"});
+    }).catch(err=>{
+      return res.status(400).json({ModelError: err});
+    })
+   } catch (err) {
+    return res.status(400).json({error: err});
+  }
+});
+
+app.delete('/recommend', auth.userAuth, async function(req,res){
+  try {
+    var obj = {
+      user_id: req.body.userId,
+      ratings: req.body.ratings,
+      type: "Delete",
+      number: 0 
+    }
+    let url="https://recsys-1234.herokuapp.com/predict";
+    var pr= axios.post(url,obj,{headers:{'Content-Type':'application/json'}});
+    pr.then(data=>{
+     return res.status(200).json({msg: "Delete Request Successful !!"});
+    }).catch(err=>{
+      return res.status(400).json({error: err});
+    })
+   } catch (err) {
+    return res.status(400).json({error: err});
+  }
+});
+
 app.post('/usermovie', auth.userAuth, async function(req,res){
   try {
     let user = await db.User.findOne({
       email: req.body.email
     });
     var movieIds=req.body.movieIds;
+    console.log(movieIds);
     for(var i=0;i<movieIds.length;i++)
-    {
-     let movie = await db.Movie.findOne({
-      movieId: movieIds[i]
-     });
-     user.movies.push(movie._id);
+    {  
+     var obj = {
+      id: movieIds[i].id,
+      rating: movieIds[i].rating
+     }
+     user.movies.push(obj);
     }
     await user.save();
     return res.status(200).json({msg: "Movies Added"});
@@ -104,12 +189,11 @@ app.delete('/usermovie', auth.userAuth, async function(req,res){
     let user = await db.User.findOne({
       email: req.body.email
     });
-    let movie = await db.Movie.findOne({
-      movieId: req.body.movieId
-    });
-    user.movies.remove(movie._id);
+    if(user.movies.length<=5)
+      return res.status(400).json({msg: "Minimum five movies are required for recommendation!!"});
+    user.movies=user.movies.filter((item) => item.id !== req.body.id);
     await user.save();
-    return res.status(200).json(movie);
+    return res.status(200).json({msg: "Movie Removed"});
    } catch (err) {
     return res.status(400).json({error: err});
   }
