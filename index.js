@@ -20,7 +20,7 @@ app.post('/signup',async function(req,res){
     uuid.currentMaxUserId+=1;
     await uuid.save();
     await user.save();
-    let { id, username, admin, userId } = user;
+    let { id, username, admin, userId, email } = user;
     let token = jwt.sign(
       {
         id,
@@ -33,6 +33,7 @@ app.post('/signup',async function(req,res){
       id,
       username,
       userId,
+      email,
       token
     });
   } catch (err) {
