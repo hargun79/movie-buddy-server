@@ -83,7 +83,7 @@ app.post('/signin',async function(req,res){
 app.get('/recommend', auth.userAuth, async function(req,res){
   try {
     let user = await db.User.findOne({
-      email: req.body.email
+      email: req.query.email
     });
     var obj = {
       user_id: user.userId,
