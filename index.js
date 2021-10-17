@@ -80,6 +80,15 @@ app.post('/signin',async function(req,res){
   }
 });
 
+app.get('/getallmovies', auth.userAuth, async function(req,res){
+  try {
+     let movies=await db.Movie.find({});
+     return res.status(200).json(movies);  
+   } catch (err) {
+    return res.status(400).json({error: err});
+  }
+});
+
 app.get('/recommend', auth.userAuth, async function(req,res){
   try {
     let user = await db.User.findOne({
