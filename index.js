@@ -99,6 +99,20 @@ app.get('/getusermovies', auth.userAuth, async function(req,res){
   }
 });
 
+app.post('/getmoviesbyids', auth.userAuth, async function(req,res){
+  try {
+     let arr=req.body.ids;
+     let ret=[];
+     for(var i=0;i<arr.length;i++){
+      let movie=await db.Movie.findOne({movieId: arr[i]});
+      ret.push(movie);
+     }
+     return res.status(200).json(ret);
+   } catch (err) {
+    return res.status(400).json({error: err});
+  }
+});
+
 app.get('/recommend', auth.userAuth, async function(req,res){
   try {
     let user = await db.User.findOne({
