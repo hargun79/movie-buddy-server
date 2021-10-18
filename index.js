@@ -91,7 +91,8 @@ app.get('/getallmovies', auth.userAuth, async function(req,res){
 
 app.get('/getusermovies', auth.userAuth, async function(req,res){
   try {
-     let user=await db.User.findOne({id: req.query.userId});
+     let user=await db.User.findOne({email: req.query.email});
+     console.log(user);
      return res.status(200).json(user.movies);  
    } catch (err) {
     return res.status(400).json({error: err});
