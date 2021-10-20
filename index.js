@@ -92,7 +92,6 @@ app.get('/getallmovies', auth.userAuth, async function(req,res){
 app.get('/getusermovies', auth.userAuth, async function(req,res){
   try {
      let user=await db.User.findOne({email: req.query.email});
-     console.log(user);
      return res.status(200).json(user.movies);  
    } catch (err) {
     return res.status(400).json({error: err});
@@ -202,7 +201,6 @@ app.post('/usermovie', auth.userAuth, async function(req,res){
       email: req.body.email
     });
     var movieIds=req.body.movieIds;
-    console.log(movieIds);
     for(var i=0;i<movieIds.length;i++)
     {  
      var obj = {
@@ -251,9 +249,11 @@ app.post('/movie', auth.adminAuth, async function(req,res){
     let movie = await db.Movie.create({
       movieId: req.body.movieId,
       title: req.body.title,
-      date: req.body.date,
-      imdb: req.body.imdb,
-      Genre: req.body.Genre 
+      imdbId: req.body.imdbId,
+      youtubeId: req.body.youtubeId,
+      Genre: req.body.Genre,
+      posterUrl: req.body.posterUrl,
+      youtubeUrl: req.body.youtubeUrl
     });
     return res.status(200).json(movie);
    } catch (err) {

@@ -11,17 +11,23 @@ const movieSchema = new mongoose.Schema({
     required: true,
     unique: true
   },
-  date: {
-    type: String,
+  imdbId: {
+    type: Number,
   },
-  imdb: {
+  youtubeId: {
     type: String,
   },
   Genre: [
    {
     type: String,
    }
-  ]
+  ],
+  posterUrl: {
+    type: String,
+  },
+  youtubeUrl: {
+    type: String,
+  }
 });
 
 const Movie = mongoose.model("Movie", movieSchema);
